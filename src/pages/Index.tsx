@@ -24,7 +24,7 @@ export default function Index() {
         <p className="text-primary-foreground/80 mb-1 max-w-lg">
           Learn financial literacy through quick lessons, earn points, and redeem real rewards.
         </p>
-        <p className="text-primary-foreground/60 text-sm mb-6">Built by an MHS student 💙💛</p>
+        <p className="text-primary-foreground/60 text-sm mb-6">Built by an MHS student</p>
         <div className="flex flex-wrap gap-4">
           <Link to="/lessons">
             <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold hotspot">
@@ -32,7 +32,7 @@ export default function Index() {
             </Button>
           </Link>
           <Link to="/progress">
-            <Button variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+            <Button variant="outline" className="border-primary-foreground/50 text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground/20">
               <Trophy className="mr-2 h-4 w-4" /> View Progress
             </Button>
           </Link>
