@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
@@ -57,7 +57,6 @@ export default function LessonView() {
     if (currentQuizQ < lesson.quiz.length - 1) {
       setCurrentQuizQ(currentQuizQ + 1);
     } else {
-      // Calculate score
       const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
       const score = Math.round((correct / lesson.quiz.length) * 100);
       completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
@@ -68,12 +67,13 @@ export default function LessonView() {
   const quizScore = phase === "results" ? lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0) : 0;
 
   if (phase === "results") {
+    const nextLesson = lessons.find(l => l.id === lesson.id + 1);
     return (
       <div className="container py-8 animate-slide-up">
         <div className="max-w-lg mx-auto rounded-xl border bg-card p-8 text-center">
           <div className="text-5xl mb-4">🎉</div>
           <h2 className="font-heading text-2xl font-bold mb-2">Lesson Complete!</h2>
-          <p className="text-muted-foreground mb-4">{lesson.title}</p>
+          <p className="text-muted-foreground mb-4">{lesson.icon} {lesson.title}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="rounded-lg bg-muted p-3">
               <p className="text-2xl font-bold text-primary">{quizScore}/{lesson.quiz.length}</p>
@@ -85,8 +85,13 @@ export default function LessonView() {
             </div>
           </div>
           <p className="text-sm text-muted-foreground mb-4">+{lesson.redeemablePoints} Redeemable Points earned!</p>
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 justify-center flex-wrap">
             <Link to="/lessons"><Button variant="outline">All Lessons</Button></Link>
+            {nextLesson && (
+              <Link to={`/lessons/${nextLesson.id}`}>
+                <Button className="hotspot">Next: {nextLesson.title} <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
+            )}
             <Link to="/rewards"><Button className="gold-gradient text-secondary-foreground font-semibold">View Rewards</Button></Link>
           </div>
         </div>
@@ -142,9 +147,12 @@ export default function LessonView() {
           <Link to="/lessons">
             <Button variant="ghost" size="icon"><ArrowLeft className="h-5 w-5" /></Button>
           </Link>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary">Lesson {lesson.id}</p>
-            <h1 className="font-heading text-xl font-bold">{lesson.title}</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{lesson.icon}</span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-secondary">Lesson {lesson.id} of {lessons.length}</p>
+              <h1 className="font-heading text-xl font-bold">{lesson.title}</h1>
+            </div>
           </div>
         </div>
 
@@ -160,7 +168,10 @@ export default function LessonView() {
             {step.type === "text" && <BookOpen className="h-4 w-4 text-primary" />}
             {step.type === "video" && <Play className="h-4 w-4 text-primary" />}
             {step.type === "exercise" && <Pencil className="h-4 w-4 text-secondary" />}
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{step.type}</span>
+            {step.type === "interactive" && <ExternalLink className="h-4 w-4 text-secondary" />}
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {step.type === "interactive" ? "Interactive Tool" : step.type}
+            </span>
           </div>
           <h3 className="font-heading text-lg font-semibold mb-3">{step.title}</h3>
 
@@ -175,6 +186,20 @@ export default function LessonView() {
               <p className="text-sm text-muted-foreground mb-3">{step.content}</p>
               <div className="aspect-video rounded-lg overflow-hidden bg-muted">
                 <iframe src={step.videoUrl} className="w-full h-full" allowFullScreen title={step.title} />
+              </div>
+            </div>
+          )}
+
+          {step.type === "interactive" && (
+            <div>
+              <p className="text-sm text-muted-foreground mb-4">{step.content}</p>
+              <a href={step.interactiveUrl} target="_blank" rel="noopener noreferrer">
+                <Button className="hotspot">
+                  <ExternalLink className="mr-2 h-4 w-4" /> Open Salary Calculator
+                </Button>
+              </a>
+              <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-muted border">
+                <iframe src={step.interactiveUrl} className="w-full h-full" title={step.title} />
               </div>
             </div>
           )}

@@ -1,5 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
-import { BookOpen, Trophy, Gift, BarChart3, Home, Coins } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BookOpen, Trophy, Gift, BarChart3, Home, Coins, Users, LogOut } from "lucide-react";
+import { logoutUser } from "@/pages/Login";
 
 interface AppNavbarProps {
   knowledgePoints: number;
@@ -10,12 +11,19 @@ interface AppNavbarProps {
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/lessons", icon: BookOpen, label: "Lessons" },
+  { to: "/leaderboard", icon: Users, label: "Ranks" },
   { to: "/progress", icon: BarChart3, label: "Progress" },
   { to: "/rewards", icon: Gift, label: "Rewards" },
 ];
 
 export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotspots }: AppNavbarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate("/login");
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
@@ -52,6 +60,9 @@ export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotsp
             <Coins className="h-4 w-4" />
             <span>{redeemablePoints} RP</span>
           </div>
+          <button onClick={handleLogout} className="p-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors" title="Sign Out">
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
