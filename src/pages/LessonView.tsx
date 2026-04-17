@@ -161,10 +161,38 @@ export default function LessonView() {
   }
 
   if (phase === "quiz") {
+    if (!quizStarted) {
+      return (
+        <div className="container py-8 animate-slide-up">
+          <div className="max-w-lg mx-auto rounded-xl border bg-card p-8">
+            <ShieldAlert className="h-12 w-12 text-secondary mx-auto mb-4" />
+            <h2 className="font-heading text-2xl font-bold mb-2 text-center">Secure Quiz Mode</h2>
+            <p className="text-muted-foreground text-sm mb-4 text-center">
+              To keep things fair, the quiz runs in a locked-down mode.
+            </p>
+            <ul className="text-sm text-foreground/90 space-y-2 mb-6 bg-muted/50 rounded-lg p-4">
+              <li>• The quiz opens in <strong>fullscreen</strong></li>
+              <li>• <strong>Switching tabs</strong>, leaving the window, or exiting fullscreen counts as a warning</li>
+              <li>• <strong>Copy, paste, and right-click</strong> are disabled</li>
+              <li>• You get <strong>{MAX_WARNINGS} warnings</strong> — after that, the quiz auto-submits</li>
+            </ul>
+            <Button onClick={startQuiz} className="w-full hotspot">
+              <Maximize className="mr-2 h-4 w-4" /> Start Secure Quiz
+            </Button>
+          </div>
+        </div>
+      );
+    }
     const q = lesson.quiz[currentQuizQ];
     return (
-      <div className="container py-8 animate-slide-up">
+      <div ref={quizContainerRef} className="container py-8 animate-slide-up bg-background min-h-screen select-none">
         <div className="max-w-lg mx-auto">
+          {warnings > 0 && (
+            <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 p-3 flex items-center gap-2 text-sm">
+              <ShieldAlert className="h-4 w-4 text-destructive shrink-0" />
+              <span className="text-destructive font-medium">Warning {warnings}/{MAX_WARNINGS} — stay on this tab in fullscreen.</span>
+            </div>
+          )}
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading text-xl font-bold">Quiz: {lesson.title}</h2>
             <span className="text-sm text-muted-foreground">{currentQuizQ + 1}/{lesson.quiz.length}</span>
