@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink, ShieldAlert, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
+import { toast } from "@/hooks/use-toast";
+
+const MAX_WARNINGS = 2;
 
 export default function LessonView() {
   const { id } = useParams();
@@ -17,6 +20,10 @@ export default function LessonView() {
   const [currentQuizQ, setCurrentQuizQ] = useState(0);
   const [exerciseAnswer, setExerciseAnswer] = useState<number | null>(null);
   const [exerciseSubmitted, setExerciseSubmitted] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [warnings, setWarnings] = useState(0);
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const quizContainerRef = useRef<HTMLDivElement>(null);
 
   if (!lesson) return <div className="container py-8"><p>Lesson not found.</p><Link to="/lessons" className="text-primary underline">Back to lessons</Link></div>;
   if (!isLessonUnlocked(lesson.id)) return <div className="container py-8"><p>This lesson is locked. Complete the previous lesson first.</p><Link to="/lessons" className="text-primary underline">Back to lessons</Link></div>;
