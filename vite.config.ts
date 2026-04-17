@@ -20,3 +20,7 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
 }));
+export default defineConfig({
+  base: '/questlearn-pro/', // Add this line
+  plugins: [react()],
+})
