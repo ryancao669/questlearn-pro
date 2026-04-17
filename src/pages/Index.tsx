@@ -3,9 +3,11 @@ import { BookOpen, Trophy, Gift, Flame, ArrowRight, Coins, Star, Users } from "l
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
+import { getCurrentUser } from "@/pages/Login";
 
 export default function Index() {
   const { progress, isLessonUnlocked, isLessonCompleted } = useProgress();
+  const user = getCurrentUser();
 
   const lessonOfTheDay = lessons.find(l => !isLessonCompleted(l.id) && isLessonUnlocked(l.id)) || lessons[0];
   const completionPercent = Math.round((progress.completedLessons.length / lessons.length) * 100);
