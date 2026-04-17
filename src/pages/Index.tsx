@@ -3,11 +3,12 @@ import { BookOpen, Trophy, Gift, Flame, ArrowRight, Coins, Star, Users } from "l
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
-import { getCurrentUser } from "@/pages/Login";
+import { getCurrentUser, getStudentRecord } from "@/pages/Login";
 
 export default function Index() {
   const { progress, isLessonUnlocked, isLessonCompleted } = useProgress();
   const user = getCurrentUser();
+  const record = getStudentRecord(user);
 
   const lessonOfTheDay = lessons.find(l => !isLessonCompleted(l.id) && isLessonUnlocked(l.id)) || lessons[0];
   const completionPercent = Math.round((progress.completedLessons.length / lessons.length) * 100);
@@ -17,20 +18,22 @@ export default function Index() {
       {/* User card */}
       {user && (
         <div className="rounded-xl border bg-card p-4 flex items-center gap-4">
-          {user.idPhoto ? (
+          {record?.idPhoto ? (
             <img
-              src={user.idPhoto}
+              src={record.idPhoto}
               alt={`${user.displayName} ID`}
               className="h-16 w-16 rounded-lg object-cover border"
             />
           ) : (
-            <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs">
-              No ID
+            <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs text-center px-1">
+              No ID on file
             </div>
           )}
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Signed in as</p>
-            <p className="font-heading text-lg font-bold truncate">{user.displayName}</p>
+            <p className="font-heading text-lg font-bold truncate">
+              {record ? `${record.firstName} ${record.lastName}` : user.displayName}
+            </p>
             <p className="text-xs text-muted-foreground">Student ID: {user.studentId}</p>
           </div>
         </div>
