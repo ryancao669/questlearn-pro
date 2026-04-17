@@ -131,8 +131,9 @@ export default function LessonView() {
     return (
       <div className="container py-8 animate-slide-up">
         <div className="max-w-lg mx-auto rounded-xl border bg-card p-8 text-center">
-          <div className="text-5xl mb-4">🎉</div>
-          <h2 className="font-heading text-2xl font-bold mb-2">Lesson Complete!</h2>
+          <div className="text-5xl mb-4">{autoSubmitted ? "⚠️" : "🎉"}</div>
+          <h2 className="font-heading text-2xl font-bold mb-2">{autoSubmitted ? "Quiz Auto-Submitted" : "Lesson Complete!"}</h2>
+          {autoSubmitted && <p className="text-sm text-destructive mb-2">Too many anti-cheat violations during the quiz.</p>}
           <p className="text-muted-foreground mb-4">{lesson.icon} {lesson.title}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="rounded-lg bg-muted p-3">
