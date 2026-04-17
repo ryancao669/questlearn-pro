@@ -62,7 +62,7 @@ export const lessons: Lesson[] = [
         type: "video",
         title: "How Debit vs Credit Cards Work",
         content: "Watch this quick explainer on the difference between debit and credit cards.",
-        videoUrl: "https://www.youtube.com/embed/cKPKBKjmGBk"
+        videoUrl: "https://www.youtube.com/embed/sef2NaBhSmM"
       },
       {
         type: "text",
