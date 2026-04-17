@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink, ShieldAlert, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
+import { toast } from "@/hooks/use-toast";
+
+const MAX_WARNINGS = 2;
 
 export default function LessonView() {
   const { id } = useParams();
@@ -17,6 +20,61 @@ export default function LessonView() {
   const [currentQuizQ, setCurrentQuizQ] = useState(0);
   const [exerciseAnswer, setExerciseAnswer] = useState<number | null>(null);
   const [exerciseSubmitted, setExerciseSubmitted] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [warnings, setWarnings] = useState(0);
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const quizContainerRef = useRef<HTMLDivElement>(null);
+
+  const finishQuiz = useCallback((wasAutoSubmitted = false) => {
+    if (!lesson) return;
+    const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
+    const score = Math.round((correct / lesson.quiz.length) * 100);
+    completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
+    if (wasAutoSubmitted) setAutoSubmitted(true);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    setPhase("results");
+  }, [lesson, quizAnswers, completeLesson]);
+
+  const triggerWarning = useCallback((reason: string) => {
+    setWarnings(w => {
+      const next = w + 1;
+      if (next > MAX_WARNINGS) {
+        toast({ title: "Quiz auto-submitted", description: `Too many violations: ${reason}`, variant: "destructive" });
+        finishQuiz(true);
+      } else {
+        toast({
+          title: `⚠️ Warning ${next} of ${MAX_WARNINGS}`,
+          description: `${reason}. ${MAX_WARNINGS - next + 1} more and your quiz will be auto-submitted.`,
+          variant: "destructive",
+        });
+      }
+      return next;
+    });
+  }, [finishQuiz]);
+
+  useEffect(() => {
+    if (phase !== "quiz" || !quizStarted) return;
+    const onVisibility = () => { if (document.hidden) triggerWarning("You switched tabs or minimized the window"); };
+    const onBlur = () => triggerWarning("You left the quiz window");
+    const block = (e: Event) => { e.preventDefault(); };
+    const onFsChange = () => { if (!document.fullscreenElement) triggerWarning("You exited fullscreen mode"); };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("copy", block);
+    document.addEventListener("cut", block);
+    document.addEventListener("paste", block);
+    document.addEventListener("contextmenu", block);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("copy", block);
+      document.removeEventListener("cut", block);
+      document.removeEventListener("paste", block);
+      document.removeEventListener("contextmenu", block);
+      document.removeEventListener("fullscreenchange", onFsChange);
+    };
+  }, [phase, quizStarted, triggerWarning]);
 
   if (!lesson) return <div className="container py-8"><p>Lesson not found.</p><Link to="/lessons" className="text-primary underline">Back to lessons</Link></div>;
   if (!isLessonUnlocked(lesson.id)) return <div className="container py-8"><p>This lesson is locked. Complete the previous lesson first.</p><Link to="/lessons" className="text-primary underline">Back to lessons</Link></div>;
@@ -57,11 +115,13 @@ export default function LessonView() {
     if (currentQuizQ < lesson.quiz.length - 1) {
       setCurrentQuizQ(currentQuizQ + 1);
     } else {
-      const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
-      const score = Math.round((correct / lesson.quiz.length) * 100);
-      completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
-      setPhase("results");
+      finishQuiz();
     }
+  };
+
+  const startQuiz = async () => {
+    try { await quizContainerRef.current?.requestFullscreen(); } catch { /* ignore */ }
+    setQuizStarted(true);
   };
 
   const quizScore = phase === "results" ? lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0) : 0;
@@ -71,8 +131,9 @@ export default function LessonView() {
     return (
       <div className="container py-8 animate-slide-up">
         <div className="max-w-lg mx-auto rounded-xl border bg-card p-8 text-center">
-          <div className="text-5xl mb-4">🎉</div>
-          <h2 className="font-heading text-2xl font-bold mb-2">Lesson Complete!</h2>
+          <div className="text-5xl mb-4">{autoSubmitted ? "⚠️" : "🎉"}</div>
+          <h2 className="font-heading text-2xl font-bold mb-2">{autoSubmitted ? "Quiz Auto-Submitted" : "Lesson Complete!"}</h2>
+          {autoSubmitted && <p className="text-sm text-destructive mb-2">Too many anti-cheat violations during the quiz.</p>}
           <p className="text-muted-foreground mb-4">{lesson.icon} {lesson.title}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="rounded-lg bg-muted p-3">
@@ -100,10 +161,38 @@ export default function LessonView() {
   }
 
   if (phase === "quiz") {
+    if (!quizStarted) {
+      return (
+        <div className="container py-8 animate-slide-up">
+          <div className="max-w-lg mx-auto rounded-xl border bg-card p-8">
+            <ShieldAlert className="h-12 w-12 text-secondary mx-auto mb-4" />
+            <h2 className="font-heading text-2xl font-bold mb-2 text-center">Secure Quiz Mode</h2>
+            <p className="text-muted-foreground text-sm mb-4 text-center">
+              To keep things fair, the quiz runs in a locked-down mode.
+            </p>
+            <ul className="text-sm text-foreground/90 space-y-2 mb-6 bg-muted/50 rounded-lg p-4">
+              <li>• The quiz opens in <strong>fullscreen</strong></li>
+              <li>• <strong>Switching tabs</strong>, leaving the window, or exiting fullscreen counts as a warning</li>
+              <li>• <strong>Copy, paste, and right-click</strong> are disabled</li>
+              <li>• You get <strong>{MAX_WARNINGS} warnings</strong> — after that, the quiz auto-submits</li>
+            </ul>
+            <Button onClick={startQuiz} className="w-full hotspot">
+              <Maximize className="mr-2 h-4 w-4" /> Start Secure Quiz
+            </Button>
+          </div>
+        </div>
+      );
+    }
     const q = lesson.quiz[currentQuizQ];
     return (
-      <div className="container py-8 animate-slide-up">
+      <div ref={quizContainerRef} className="container py-8 animate-slide-up bg-background min-h-screen select-none">
         <div className="max-w-lg mx-auto">
+          {warnings > 0 && (
+            <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 p-3 flex items-center gap-2 text-sm">
+              <ShieldAlert className="h-4 w-4 text-destructive shrink-0" />
+              <span className="text-destructive font-medium">Warning {warnings}/{MAX_WARNINGS} — stay on this tab in fullscreen.</span>
+            </div>
+          )}
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading text-xl font-bold">Quiz: {lesson.title}</h2>
             <span className="text-sm text-muted-foreground">{currentQuizQ + 1}/{lesson.quiz.length}</span>
