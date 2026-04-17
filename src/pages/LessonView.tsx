@@ -60,16 +60,71 @@ export default function LessonView() {
     setQuizAnswers(newAnswers);
   };
 
+  const finishQuiz = useCallback((wasAutoSubmitted = false) => {
+    if (!lesson) return;
+    const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
+    const score = Math.round((correct / lesson.quiz.length) * 100);
+    completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
+    if (wasAutoSubmitted) setAutoSubmitted(true);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    setPhase("results");
+  }, [lesson, quizAnswers, completeLesson]);
+
   const handleQuizNext = () => {
+    if (!lesson) return;
     if (currentQuizQ < lesson.quiz.length - 1) {
       setCurrentQuizQ(currentQuizQ + 1);
     } else {
-      const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
-      const score = Math.round((correct / lesson.quiz.length) * 100);
-      completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
-      setPhase("results");
+      finishQuiz();
     }
   };
+
+  const triggerWarning = useCallback((reason: string) => {
+    setWarnings(w => {
+      const next = w + 1;
+      if (next > MAX_WARNINGS) {
+        toast({ title: "Quiz auto-submitted", description: `Too many violations: ${reason}`, variant: "destructive" });
+        finishQuiz(true);
+      } else {
+        toast({
+          title: `⚠️ Warning ${next} of ${MAX_WARNINGS}`,
+          description: `${reason}. ${MAX_WARNINGS - next + 1} more and your quiz will be auto-submitted.`,
+          variant: "destructive",
+        });
+      }
+      return next;
+    });
+  }, [finishQuiz]);
+
+  useEffect(() => {
+    if (phase !== "quiz" || !quizStarted) return;
+    const onVisibility = () => { if (document.hidden) triggerWarning("You switched tabs or minimized the window"); };
+    const onBlur = () => triggerWarning("You left the quiz window");
+    const block = (e: Event) => { e.preventDefault(); };
+    const onFsChange = () => { if (!document.fullscreenElement) triggerWarning("You exited fullscreen mode"); };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("copy", block);
+    document.addEventListener("cut", block);
+    document.addEventListener("paste", block);
+    document.addEventListener("contextmenu", block);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("copy", block);
+      document.removeEventListener("cut", block);
+      document.removeEventListener("paste", block);
+      document.removeEventListener("contextmenu", block);
+      document.removeEventListener("fullscreenchange", onFsChange);
+    };
+  }, [phase, quizStarted, triggerWarning]);
+
+  const startQuiz = async () => {
+    try { await quizContainerRef.current?.requestFullscreen(); } catch { /* ignore */ }
+    setQuizStarted(true);
+  };
+
 
   const quizScore = phase === "results" ? lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0) : 0;
 
