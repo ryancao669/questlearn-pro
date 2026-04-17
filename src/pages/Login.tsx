@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Coins, LogIn, Camera, X } from "lucide-react";
+import { useState } from "react";
+import { Coins, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -8,10 +8,8 @@ const STORAGE_KEY = "cashquest-user";
 
 export interface CQUser {
   studentId: string;
-  firstName: string;
-  lastName: string;
+  dob: string;
   displayName: string;
-  idPhoto?: string; // data URL
 }
 
 export function getCurrentUser(): CQUser | null {
@@ -23,32 +21,42 @@ export function logoutUser() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+// Mock student directory — in a real app this lives in the backend.
+// Keyed by `${studentId}|${dob}` so login verifies both match.
+export interface StudentRecord {
+  firstName: string;
+  lastName: string;
+  idPhoto: string; // URL or data URL of student ID photo
+}
+
+export const STUDENT_DIRECTORY: Record<string, StudentRecord> = {
+  "123456|2008-05-14": {
+    firstName: "Ryan",
+    lastName: "Cao",
+    idPhoto: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop",
+  },
+  "234567|2007-09-02": {
+    firstName: "Alex",
+    lastName: "Nguyen",
+    idPhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+  },
+};
+
+export function getStudentRecord(user: CQUser | null): StudentRecord | null {
+  if (!user) return null;
+  return STUDENT_DIRECTORY[`${user.studentId}|${user.dob}`] ?? null;
+}
+
 export default function Login() {
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [studentId, setStudentId] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [dob, setDob] = useState("");
-  const [idPhoto, setIdPhoto] = useState<string>("");
   const [error, setError] = useState("");
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setIdPhoto(reader.result as string);
-    reader.readAsDataURL(file);
-  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!firstName.trim() || !lastName.trim()) {
-      setError("Please enter your first and last name.");
-      return;
-    }
     if (!studentId.trim()) {
       setError("Please enter your Student ID.");
       return;
@@ -57,18 +65,12 @@ export default function Login() {
       setError("Please enter your Date of Birth.");
       return;
     }
-    if (!idPhoto) {
-      setError("Please upload a photo of your student ID.");
-      return;
-    }
 
-    const user: CQUser = {
-      studentId: studentId.trim(),
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      displayName: `${firstName.trim()} ${lastName.trim()}`,
-      idPhoto,
-    };
+    const id = studentId.trim();
+    const record = STUDENT_DIRECTORY[`${id}|${dob}`];
+    const displayName = record ? `${record.firstName} ${record.lastName}` : `Student ${id}`;
+
+    const user: CQUser = { studentId: id, dob, displayName };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     navigate("/");
   };
@@ -85,26 +87,6 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleLogin} className="rounded-xl border bg-card p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium mb-1 block">First Name</label>
-              <Input
-                placeholder="First"
-                value={firstName}
-                onChange={e => setFirstName(e.target.value)}
-                className="text-base"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Last Name</label>
-              <Input
-                placeholder="Last"
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-                className="text-base"
-              />
-            </div>
-          </div>
           <div>
             <label className="text-sm font-medium mb-1 block">Student ID</label>
             <Input
@@ -123,43 +105,13 @@ export default function Login() {
               className="text-base"
             />
           </div>
-          <div>
-            <label className="text-sm font-medium mb-1 block">Student ID Photo</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
-            {idPhoto ? (
-              <div className="relative rounded-lg border overflow-hidden">
-                <img src={idPhoto} alt="Student ID preview" className="w-full h-40 object-cover" />
-                <button
-                  type="button"
-                  onClick={() => setIdPhoto("")}
-                  className="absolute top-2 right-2 rounded-full bg-background/80 p-1 hover:bg-background"
-                  aria-label="Remove photo"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full"
-              >
-                <Camera className="mr-2 h-4 w-4" /> Upload / Take Photo
-              </Button>
-            )}
-          </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full hotspot">
             <LogIn className="mr-2 h-4 w-4" /> Sign In
           </Button>
+          <p className="text-xs text-muted-foreground text-center pt-2">
+            Demo: try ID <span className="font-mono">123456</span> / DOB <span className="font-mono">2008-05-14</span>
+          </p>
         </form>
 
         <p className="text-xs text-muted-foreground text-center mt-4">
