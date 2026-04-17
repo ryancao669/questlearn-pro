@@ -68,7 +68,7 @@ export default function Login() {
 
     const id = studentId.trim();
     const record = STUDENT_DIRECTORY[`${id}|${dob}`];
-    const displayName = record ? `${record.firstName} ${record.lastName}` : `Student ${id}`;
+    const displayName = record ? `${record.firstName} ${record.lastName}` : "Ryan Cao";
 
     const user: CQUser = { studentId: id, dob, displayName };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
