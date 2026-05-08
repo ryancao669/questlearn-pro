@@ -31,7 +31,8 @@ export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotsp
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold text-primary">
           <Coins className="h-6 w-6 text-secondary animate-coin-bounce" />
-          Cash Quest
+          <span>Cash Quest</span>
+          {school && <span className="hidden sm:inline text-xs font-medium text-muted-foreground border-l pl-2 ml-1">{school.name}</span>}
         </Link>
 
         <div className="hidden md:flex items-center gap-1">

@@ -3,12 +3,11 @@ import { BookOpen, Trophy, Gift, Flame, ArrowRight, Coins, Star, Users } from "l
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
-import { getCurrentUser, getStudentRecord } from "@/pages/Login";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Index() {
   const { progress, isLessonUnlocked, isLessonCompleted } = useProgress();
-  const user = getCurrentUser();
-  const record = getStudentRecord(user);
+  const { profile, school } = useAuth();
 
   const lessonOfTheDay = lessons.find(l => !isLessonCompleted(l.id) && isLessonUnlocked(l.id)) || lessons[0];
   const completionPercent = Math.round((progress.completedLessons.length / lessons.length) * 100);
@@ -16,25 +15,18 @@ export default function Index() {
   return (
     <div className="container py-8 pb-24 md:pb-8 space-y-8 animate-slide-up">
       {/* User card */}
-      {user && (
+      {profile && (
         <div className="rounded-xl border bg-card p-4 flex items-center gap-4">
-          {record?.idPhoto ? (
-            <img
-              src={record.idPhoto}
-              alt={`${user.displayName} ID`}
-              className="h-16 w-16 rounded-lg object-cover border"
-            />
-          ) : (
-            <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs text-center px-1">
-              No ID on file
-            </div>
-          )}
+          <div className="h-14 w-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-heading text-xl font-bold">
+            {(profile.display_name ?? profile.email).slice(0, 1).toUpperCase()}
+          </div>
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Signed in as</p>
-            <p className="font-heading text-lg font-bold truncate">
-              {record ? `${record.firstName} ${record.lastName}` : user.displayName}
+            <p className="font-heading text-lg font-bold truncate">{profile.display_name ?? profile.email}</p>
+            <p className="text-xs text-muted-foreground">
+              {school?.name ?? "Cash Quest"}
+              {profile.student_id_number && <> • ID {profile.student_id_number}</>}
             </p>
-            <p className="text-xs text-muted-foreground">Student ID: {user.studentId}</p>
           </div>
         </div>
       )}
