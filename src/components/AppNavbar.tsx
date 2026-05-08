@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BookOpen, Trophy, Gift, BarChart3, Home, Coins, Users, LogOut } from "lucide-react";
-import { logoutUser } from "@/pages/Login";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppNavbarProps {
   knowledgePoints: number;
@@ -19,9 +19,10 @@ const navItems = [
 export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotspots }: AppNavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut, school } = useAuth();
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/login");
   };
 
@@ -30,7 +31,8 @@ export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotsp
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold text-primary">
           <Coins className="h-6 w-6 text-secondary animate-coin-bounce" />
-          Cash Quest
+          <span>Cash Quest</span>
+          {school && <span className="hidden sm:inline text-xs font-medium text-muted-foreground border-l pl-2 ml-1">{school.name}</span>}
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
