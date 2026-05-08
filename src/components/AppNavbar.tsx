@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BookOpen, Trophy, Gift, BarChart3, Home, Coins, Users, LogOut } from "lucide-react";
-import { logoutUser } from "@/pages/Login";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppNavbarProps {
   knowledgePoints: number;
@@ -19,9 +19,10 @@ const navItems = [
 export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotspots }: AppNavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut, school } = useAuth();
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/login");
   };
 
