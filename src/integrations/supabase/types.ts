@@ -14,16 +14,234 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      lesson_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          lesson_id: number
+          quiz_score: number
+          school_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          lesson_id: number
+          quiz_score?: number
+          school_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          lesson_id?: number
+          quiz_score?: number
+          school_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_completions_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string
+          id: string
+          onboarded: boolean
+          school_id: string | null
+          student_id_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email: string
+          id: string
+          onboarded?: boolean
+          school_id?: string | null
+          student_id_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          id?: string
+          onboarded?: boolean
+          school_id?: string | null
+          student_id_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_redemptions: {
+        Row: {
+          cost: number
+          fulfillment_status: string
+          id: string
+          redeemed_at: string
+          reward_id: number
+          school_id: string
+          user_id: string
+        }
+        Insert: {
+          cost: number
+          fulfillment_status?: string
+          id?: string
+          redeemed_at?: string
+          reward_id: number
+          school_id: string
+          user_id: string
+        }
+        Update: {
+          cost?: number
+          fulfillment_status?: string
+          id?: string
+          redeemed_at?: string
+          reward_id?: number
+          school_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          allowed_email_domains: string[]
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          allowed_email_domains?: string[]
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          allowed_email_domains?: string[]
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      student_progress: {
+        Row: {
+          current_streak: number
+          knowledge_points: number
+          last_completed_date: string | null
+          redeemable_points: number
+          school_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          knowledge_points?: number
+          last_completed_date?: string | null
+          redeemable_points?: number
+          school_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          knowledge_points?: number
+          last_completed_date?: string | null
+          redeemable_points?: number
+          school_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_progress_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          school_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          school_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          school_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_school_staff: {
+        Args: { _school_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_school_id: { Args: { _user_id: string }; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "school_admin" | "teacher" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +368,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "school_admin", "teacher", "student"],
+    },
   },
 } as const
