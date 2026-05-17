@@ -10,6 +10,22 @@ export default function Login() {
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setError("");
+    setGoogleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+      extraParams: { prompt: "select_account" },
+    });
+    if (result.error) {
+      setGoogleLoading(false);
+      setError(result.error.message ?? "Google sign-in failed. Try again.");
+      return;
+    }
+    // If redirected, browser is leaving the page. Otherwise session is set.
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
