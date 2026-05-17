@@ -1,0 +1,1 @@
+CREATE POLICY "schools_read_all_anon" ON public.schools FOR SELECT TO anon USING (true);
