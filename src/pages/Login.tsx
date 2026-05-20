@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
+const ADMIN_MAGIC_LINK_EMAILS = new Set(["matt@collegeboundnow.com"]);
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -36,23 +38,26 @@ export default function Login() {
       return;
     }
     const domain = trimmed.split("@")[1];
+    const isAdminEmail = ADMIN_MAGIC_LINK_EMAILS.has(trimmed);
 
     setSending(true);
-    // Verify the domain belongs to a registered school
-    const { data: schools, error: schoolErr } = await supabase
-      .from("schools")
-      .select("id,name,allowed_email_domains")
-      .contains("allowed_email_domains", [domain]);
+    if (!isAdminEmail) {
+      // Verify the domain belongs to a registered school
+      const { data: schools, error: schoolErr } = await supabase
+        .from("schools")
+        .select("id,name,allowed_email_domains")
+        .contains("allowed_email_domains", [domain]);
 
-    if (schoolErr) {
-      setSending(false);
-      setError("Something went wrong. Please try again.");
-      return;
-    }
-    if (!schools || schools.length === 0) {
-      setSending(false);
-      setError("Cash Quest isn't available at your school yet. Ask your teacher to request access.");
-      return;
+      if (schoolErr) {
+        setSending(false);
+        setError("Something went wrong. Please try again.");
+        return;
+      }
+      if (!schools || schools.length === 0) {
+        setSending(false);
+        setError("Cash Quest isn't available at your school yet. Ask your teacher to request access.");
+        return;
+      }
     }
 
     const { error: otpErr } = await supabase.auth.signInWithOtp({
