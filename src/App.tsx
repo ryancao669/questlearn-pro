@@ -34,8 +34,8 @@ function AppContent() {
     <>
       {showNavbar && <AppNavbar knowledgePoints={progress.knowledgePoints} redeemablePoints={progress.redeemablePoints} showHotspots />}
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/onboarding" element={user ? <Onboarding /> : <Navigate to="/login" replace />} />
+        <Route path="/login" element={user ? <Navigate to={profile?.onboarded ? "/" : "/onboarding"} replace /> : <Login />} />
+        <Route path="/onboarding" element={!user ? <Navigate to="/login" replace /> : profile?.onboarded ? <Navigate to="/" replace /> : <Onboarding />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/lessons" element={<ProtectedRoute><Lessons /></ProtectedRoute>} />
         <Route path="/lessons/:id" element={<ProtectedRoute><LessonView /></ProtectedRoute>} />
