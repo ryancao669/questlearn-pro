@@ -253,8 +253,20 @@ export const lessons: Lesson[] = [
         options: ["50%", "80%", "30%", "100%"],
         correctIndex: 2
       }
-    ]
+    ],
+    scenarios: [
+      {
+        title: "Your First Credit Card",
+        situation: "You just got approved for a credit card with a $1,000 limit. You really want a new $700 pair of headphones. What do you do?",
+        choices: [
+          { label: "Buy them — you'll pay the bill at the end of the month", outcome: "Risky. That's 70% utilization, which can ding your credit score even if you pay on time. Try to stay under 30% ($300).", isBest: false },
+          { label: "Save up and pay in cash, use the card for small purchases you can pay off monthly", outcome: "Smart move. Low utilization + on-time payments = strong credit history. Your future self will thank you.", isBest: true },
+          { label: "Max it out — points and rewards!", outcome: "Bad call. Maxing a card tanks your score and traps you in high-interest debt if you can't pay it off in full.", isBest: false },
+        ],
+      },
+    ],
   },
+
   {
     id: 4,
     title: "Debt: Uses & Effects",
@@ -313,8 +325,20 @@ export const lessons: Lesson[] = [
         options: ["It hurts your credit score immediately", "You pay much more in interest over time", "The bank closes your account", "You can't make purchases"],
         correctIndex: 1
       }
-    ]
+    ],
+    scenarios: [
+      {
+        title: "The Surprise Expense",
+        situation: "Your car breaks down and the repair costs $500. You have $300 in savings. How do you cover the rest?",
+        choices: [
+          { label: "Take out a payday loan for the $200", outcome: "Avoid this. Payday loans often have 300%+ APR — you could end up owing $400+ on a $200 loan.", isBest: false },
+          { label: "Use your $300 savings + put $200 on a credit card you can pay off next month", outcome: "Reasonable. As long as you pay the full balance before interest hits, this is the cheapest borrowing option.", isBest: true },
+          { label: "Ignore it and keep driving", outcome: "A small problem becomes a $2,000 problem. Delayed maintenance almost always costs more.", isBest: false },
+        ],
+      },
+    ],
   },
+
   {
     id: 6,
     title: "Investing & Building Wealth",
@@ -433,8 +457,20 @@ export const lessons: Lesson[] = [
         options: ["Wait and see", "Contact your bank immediately", "Post about it online", "Close all your accounts"],
         correctIndex: 1
       }
-    ]
+    ],
+    scenarios: [
+      {
+        title: "Suspicious Text Message",
+        situation: '"BANK ALERT: Unusual activity on your account. Click here to verify: bit.ly/secure-bank-login" — what do you do?',
+        choices: [
+          { label: "Click the link and log in to check", outcome: "That's exactly what scammers want. The fake site captures your login and drains your account.", isBest: false },
+          { label: "Ignore the text and log into your bank using the official app or website", outcome: "Perfect. Always go to the source directly. If something's wrong, your real bank app will show it.", isBest: true },
+          { label: "Reply STOP to unsubscribe", outcome: "Replying confirms your number is active — you'll get even more scam texts. Just delete and report as spam.", isBest: false },
+        ],
+      },
+    ],
   },
+
   {
     id: 8,
     title: "Financing Your Education",
