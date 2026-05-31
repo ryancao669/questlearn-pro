@@ -176,6 +176,65 @@ export default function LessonView() {
     );
   }
 
+  if (phase === "scenarios" && lesson.scenarios) {
+    const scenario = lesson.scenarios[scenarioIndex];
+    const selected = scenarioChoice !== null ? scenario.choices[scenarioChoice] : null;
+    return (
+      <div className="container py-8 pb-24 md:pb-8 animate-slide-up">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <Lightbulb className="h-5 w-5 text-secondary" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-secondary">What Would You Do?</p>
+              <h1 className="font-heading text-xl font-bold">{scenario.title}</h1>
+            </div>
+          </div>
+          <div className="h-2 rounded-full bg-muted mb-6">
+            <div className="h-full rounded-full bg-secondary transition-all" style={{ width: `${((scenarioIndex + 1) / lesson.scenarios.length) * 100}%` }} />
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">Scenario {scenarioIndex + 1} of {lesson.scenarios.length}</p>
+
+          <div className="rounded-xl border bg-card p-6 mb-4">
+            <p className="text-foreground/90 mb-5">{scenario.situation}</p>
+            <div className="space-y-2">
+              {scenario.choices.map((c, i) => {
+                let style = "border-border hover:border-primary/50";
+                if (scenarioChoice !== null) {
+                  if (i === scenarioChoice) style = c.isBest ? "border-success bg-success/10" : "border-secondary bg-secondary/10";
+                  else style = "border-border opacity-60";
+                }
+                return (
+                  <button
+                    key={i}
+                    onClick={() => { if (scenarioChoice === null) setScenarioChoice(i); }}
+                    disabled={scenarioChoice !== null}
+                    className={`w-full text-left px-4 py-3 rounded-lg border transition-all text-sm ${style}`}
+                  >
+                    {c.label}
+                    {scenarioChoice !== null && i === scenarioChoice && c.isBest && <CheckCircle2 className="inline ml-2 h-4 w-4 text-success" />}
+                  </button>
+                );
+              })}
+            </div>
+            {selected && (
+              <div className={`mt-4 rounded-lg p-4 text-sm ${selected.isBest ? "bg-success/10 text-foreground" : "bg-muted text-foreground/90"}`}>
+                <p className="font-semibold mb-1">{selected.isBest ? "✓ Best choice" : "Here's what happens:"}</p>
+                <p>{selected.outcome}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end">
+            <Button onClick={handleScenarioNext} disabled={scenarioChoice === null} className="hotspot">
+              {scenarioIndex < lesson.scenarios.length - 1 ? "Next Scenario" : "Take Quiz"} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   if (phase === "quiz") {
     if (!quizStarted) {
       return (
