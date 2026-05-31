@@ -415,7 +415,7 @@ export default function LessonView() {
             disabled={step.type === "exercise" && !exerciseSubmitted}
             className="hotspot"
           >
-            {stepIndex < totalSteps - 1 ? "Next" : "Take Quiz"} <ArrowRight className="ml-2 h-4 w-4" />
+            {stepIndex < totalSteps - 1 ? "Next" : (lesson.scenarios && lesson.scenarios.length > 0 ? "What Would You Do?" : "Take Quiz")} <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>
