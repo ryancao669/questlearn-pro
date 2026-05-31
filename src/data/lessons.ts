@@ -16,6 +16,18 @@ export interface LessonStep {
   interactiveUrl?: string;
 }
 
+export interface ScenarioChoice {
+  label: string;
+  outcome: string;
+  isBest?: boolean;
+}
+
+export interface Scenario {
+  title: string;
+  situation: string;
+  choices: ScenarioChoice[];
+}
+
 export interface Lesson {
   id: number;
   title: string;
@@ -27,7 +39,9 @@ export interface Lesson {
   redeemablePoints: number;
   steps: LessonStep[];
   quiz: QuizQuestion[];
+  scenarios?: Scenario[];
 }
+
 
 export const lessons: Lesson[] = [
   {
