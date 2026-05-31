@@ -6,6 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 const ADMIN_MAGIC_LINK_EMAILS = new Set(["matt@collegeboundnow.com"]);
+const PUBLISHED_APP_URL = "https://quest-sparkle-point.lovable.app";
+
+function getAuthRedirectUrl() {
+  const origin = window.location.origin;
+  return origin.includes("id-preview--") ? PUBLISHED_APP_URL : origin;
+}
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,7 +24,7 @@ export default function Login() {
     setError("");
     setGoogleLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: getAuthRedirectUrl(),
       extraParams: { prompt: "select_account" },
     });
     if (result.error) {
@@ -62,7 +68,7 @@ export default function Login() {
 
     const { error: otpErr } = await supabase.auth.signInWithOtp({
       email: trimmed,
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: getAuthRedirectUrl() },
     });
     setSending(false);
     if (otpErr) {
