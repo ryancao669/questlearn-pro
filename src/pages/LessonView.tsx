@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink, ShieldAlert, Maximize } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, BookOpen, Play, Pencil, ExternalLink, ShieldAlert, Maximize, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
@@ -102,11 +102,24 @@ export default function LessonView() {
     setExerciseSubmitted(false);
     if (stepIndex < totalSteps - 1) {
       setStepIndex(stepIndex + 1);
+    } else if (lesson.scenarios && lesson.scenarios.length > 0) {
+      setPhase("scenarios");
     } else {
       setPhase("quiz");
       setQuizAnswers(new Array(lesson.quiz.length).fill(null));
     }
   };
+
+  const handleScenarioNext = () => {
+    setScenarioChoice(null);
+    if (lesson.scenarios && scenarioIndex < lesson.scenarios.length - 1) {
+      setScenarioIndex(scenarioIndex + 1);
+    } else {
+      setPhase("quiz");
+      setQuizAnswers(new Array(lesson.quiz.length).fill(null));
+    }
+  };
+
 
   const handleQuizAnswer = (answerIndex: number) => {
     const newAnswers = [...quizAnswers];
