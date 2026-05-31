@@ -123,13 +123,61 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <Coins className="h-10 w-10 text-secondary animate-coin-bounce" />
+            <button
+              type="button"
+              onClick={handleCoinTap}
+              aria-label="Cash Quest"
+              className="focus:outline-none"
+            >
+              <Coins className="h-10 w-10 text-secondary animate-coin-bounce" />
+            </button>
           </div>
           <h1 className="font-heading text-3xl font-bold text-primary">Cash Quest</h1>
           <p className="text-muted-foreground text-sm mt-1">Financial literacy, gamified.</p>
         </div>
 
-        {sent ? (
+        {creatorMode ? (
+          <div className="rounded-xl border bg-card p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-heading text-lg font-bold">Creator Sign-in</h2>
+              <button
+                type="button"
+                onClick={() => { setCreatorMode(false); setError(""); setCreatorPassword(""); }}
+                className="text-xs text-muted-foreground underline"
+              >
+                Back
+              </button>
+            </div>
+            <form onSubmit={handleCreatorLogin} className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Email</label>
+                <Input
+                  type="email"
+                  placeholder="creator@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="text-base"
+                  autoComplete="email"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Password</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={creatorPassword}
+                  onChange={(e) => setCreatorPassword(e.target.value)}
+                  className="text-base"
+                  autoComplete="current-password"
+                />
+              </div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button type="submit" className="w-full" disabled={creatorLoading}>
+                {creatorLoading ? "Signing in..." : "Sign in"}
+              </Button>
+            </form>
+          </div>
+        ) : sent ? (
           <div className="rounded-xl border bg-card p-6 text-center space-y-3">
             <CheckCircle2 className="h-10 w-10 text-success mx-auto" />
             <h2 className="font-heading text-xl font-bold">Check your inbox</h2>
