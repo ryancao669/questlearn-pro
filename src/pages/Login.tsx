@@ -26,6 +26,39 @@ export default function Login() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [coinTaps, setCoinTaps] = useState(0);
+  const [creatorMode, setCreatorMode] = useState(false);
+  const [creatorPassword, setCreatorPassword] = useState("");
+  const [creatorLoading, setCreatorLoading] = useState(false);
+
+  const handleCoinTap = () => {
+    const next = coinTaps + 1;
+    setCoinTaps(next);
+    if (next >= 5) {
+      setCreatorMode(true);
+      setCoinTaps(0);
+    }
+  };
+
+  const handleCreatorLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !creatorPassword) {
+      setError("Enter email and password.");
+      return;
+    }
+    setCreatorLoading(true);
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: trimmed,
+      password: creatorPassword,
+    });
+    setCreatorLoading(false);
+    if (signInErr) {
+      setError(signInErr.message);
+      return;
+    }
+  };
 
   const handleGoogle = async () => {
     setError("");
