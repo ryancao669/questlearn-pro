@@ -18,12 +18,18 @@ export interface ProfileRow {
   onboarded: boolean;
 }
 
+const CREATOR_EMAILS = ["caoryan669@gmail.com"];
+const STUDENT_VIEW_KEY = "creator_student_view";
+
 interface AuthContextValue {
   loading: boolean;
   session: Session | null;
   user: User | null;
   profile: ProfileRow | null;
   school: SchoolRow | null;
+  isCreator: boolean;
+  studentView: boolean;
+  toggleStudentView: () => void;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -35,6 +41,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [school, setSchool] = useState<SchoolRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [studentView, setStudentView] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem(STUDENT_VIEW_KEY) === "1";
+  });
+
+  const toggleStudentView = useCallback(() => {
+    setStudentView((v) => {
+      const next = !v;
+      try { window.localStorage.setItem(STUDENT_VIEW_KEY, next ? "1" : "0"); } catch {}
+      return next;
+    });
+  }, []);
+
+  const isCreator = !!session?.user?.email && CREATOR_EMAILS.includes(session.user.email.toLowerCase());
 
   const loadProfile = useCallback(async (userId: string) => {
     const { data: prof } = await supabase
@@ -87,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ loading, session, user: session?.user ?? null, profile, school, refreshProfile, signOut }}
+      value={{ loading, session, user: session?.user ?? null, profile, school, isCreator, studentView, toggleStudentView, refreshProfile, signOut }}
     >
       {children}
     </AuthContext.Provider>
