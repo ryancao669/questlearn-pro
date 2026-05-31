@@ -1,17 +1,30 @@
 import { Link } from "react-router-dom";
-import { Lock, CheckCircle2, ArrowRight, Clock, Star } from "lucide-react";
+import { Lock, CheckCircle2, ArrowRight, Clock, Star, Eye, EyeOff } from "lucide-react";
 import { lessons } from "@/data/lessons";
 import { useProgress } from "@/hooks/useProgress";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Lessons() {
   const { isLessonUnlocked, isLessonCompleted, progress } = useProgress();
+  const { isCreator, studentView, toggleStudentView } = useAuth();
 
   return (
     <div className="container py-8 pb-24 md:pb-8 animate-slide-up">
-      <div className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-secondary mb-1">Cash Quest</p>
-        <h1 className="font-heading text-3xl font-bold">Lesson Library</h1>
-        <p className="text-muted-foreground mt-1">Complete lessons in order to unlock the next one. {progress.completedLessons.length}/{lessons.length} completed.</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-secondary mb-1">Cash Quest</p>
+          <h1 className="font-heading text-3xl font-bold">Lesson Library</h1>
+          <p className="text-muted-foreground mt-1">Complete lessons in order to unlock the next one. {progress.completedLessons.length}/{lessons.length} completed.</p>
+        </div>
+        {isCreator && (
+          <button
+            onClick={toggleStudentView}
+            className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-muted transition-colors"
+          >
+            {studentView ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {studentView ? "Exit Student View" : "Student View"}
+          </button>
+        )}
       </div>
 
       <div className="space-y-4">

@@ -23,7 +23,8 @@ const DEFAULT_PROGRESS: UserProgress = {
 };
 
 export function useProgress() {
-  const { user, profile } = useAuth();
+  const { user, profile, isCreator, studentView } = useAuth();
+  const creatorBypass = isCreator && !studentView;
   const [progress, setProgress] = useState<UserProgress>(DEFAULT_PROGRESS);
   const [loaded, setLoaded] = useState(false);
 
@@ -132,8 +133,8 @@ export function useProgress() {
   );
 
   const isLessonUnlocked = useCallback(
-    (lessonId: number) => lessonId === 1 || progress.completedLessons.includes(lessonId - 1),
-    [progress.completedLessons]
+    (lessonId: number) => creatorBypass || lessonId === 1 || progress.completedLessons.includes(lessonId - 1),
+    [progress.completedLessons, creatorBypass]
   );
 
   const isLessonCompleted = useCallback(

@@ -302,66 +302,6 @@ export const lessons: Lesson[] = [
     ]
   },
   {
-    id: 5,
-    title: "Tax System & Filing",
-    description: "How to read tax forms, understand pay stubs, and file your taxes.",
-    category: "Taxes",
-    icon: "📋",
-    estimatedMinutes: 3,
-    knowledgePoints: 120,
-    redeemablePoints: 60,
-    steps: [
-      {
-        type: "text",
-        title: "Reading Your Pay Stub",
-        content: "Every paycheck comes with a pay stub that breaks down your earnings and deductions.\n\n**Key sections:**\n• **Gross Pay** — Total earned before deductions\n• **Federal Tax Withheld** — Income tax for the federal government\n• **State Tax Withheld** — Income tax for your state\n• **FICA** — Social Security (6.2%) + Medicare (1.45%) = 7.65%\n• **Net Pay** — Your actual take-home amount\n\n**Other items you might see:**\n• Health insurance premiums\n• 401(k) retirement contributions\n• Year-to-date (YTD) totals\n\n**Student Action:** If you have a job, look at your most recent pay stub and identify each section."
-      },
-      {
-        type: "exercise",
-        title: "Reading a Pay Stub",
-        content: "Your pay stub shows Gross Pay: $800, Federal Tax: $60, State Tax: $30, FICA: $61.20. What is your net pay?",
-        exercisePrompt: "What is your net pay?",
-        exerciseOptions: ["$800.00", "$648.80", "$738.80", "$708.80"],
-        exerciseCorrectIndex: 1
-      },
-      {
-        type: "text",
-        title: "Important Tax Forms",
-        content: "**W-2** — From your employer. Shows total wages earned and taxes withheld for the year. You need this to file.\n\n**W-4** — You fill this out when starting a new job. Tells your employer how much tax to withhold.\n\n**1099** — For independent contractors/freelancers. Shows income where no taxes were withheld.\n\n**1040** — The main tax return form you file with the IRS.\n\n**Key Dates:**\n• January: Employers send W-2s\n• April 15: Tax filing deadline\n\n**Vocabulary:** Withholding — Money your employer takes from your paycheck before you receive it, sent to the IRS on your behalf."
-      },
-      {
-        type: "text",
-        title: "How to File Your Taxes",
-        content: "**Step 1:** Gather your forms (W-2, any 1099s)\n\n**Step 2:** Choose how to file:\n• **Free options:** IRS Free File (income under $79,000), Cash App Taxes\n• **Paid options:** TurboTax, H&R Block\n• **In person:** Tax preparers, VITA (free for low income)\n\n**Step 3:** Enter your information and income\n\n**Step 4:** Review deductions (standard deduction for most students: $14,600 in 2024)\n\n**Step 5:** Submit and wait for your refund!\n\n**Pro tip:** Most students with part-time jobs will get a full refund because they earn below the standard deduction threshold."
-      },
-      {
-        type: "exercise",
-        title: "Quick Check: Tax Forms",
-        content: "Which form does your employer give you at the end of the year showing your wages and taxes?",
-        exercisePrompt: "Which form shows your annual wages and taxes withheld?",
-        exerciseOptions: ["W-4", "1099", "W-2", "1040"],
-        exerciseCorrectIndex: 2
-      }
-    ],
-    quiz: [
-      {
-        question: "What does FICA stand for and fund?",
-        options: ["Federal Income Collection Act — income tax", "Federal Insurance Contributions Act — Social Security & Medicare", "Financial Income Credit Assessment", "Federal Interest Calculation Act"],
-        correctIndex: 1
-      },
-      {
-        question: "When is the tax filing deadline?",
-        options: ["January 1", "March 1", "April 15", "December 31"],
-        correctIndex: 2
-      },
-      {
-        question: "Which form do you fill out when starting a new job?",
-        options: ["W-2", "1040", "1099", "W-4"],
-        correctIndex: 3
-      }
-    ]
-  },
-  {
     id: 6,
     title: "Investing & Building Wealth",
     description: "Emergency funds, compound interest, stocks, and retirement accounts.",
