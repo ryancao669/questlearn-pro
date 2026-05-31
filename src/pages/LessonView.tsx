@@ -15,7 +15,7 @@ export default function LessonView() {
 
   const lesson = lessons.find(l => l.id === Number(id));
   const [stepIndex, setStepIndex] = useState(0);
-  const [phase, setPhase] = useState<"lesson" | "quiz" | "results">("lesson");
+  const [phase, setPhase] = useState<"lesson" | "scenarios" | "quiz" | "results">("lesson");
   const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([]);
   const [currentQuizQ, setCurrentQuizQ] = useState(0);
   const [exerciseAnswer, setExerciseAnswer] = useState<number | null>(null);
@@ -23,7 +23,10 @@ export default function LessonView() {
   const [quizStarted, setQuizStarted] = useState(false);
   const [warnings, setWarnings] = useState(0);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [scenarioIndex, setScenarioIndex] = useState(0);
+  const [scenarioChoice, setScenarioChoice] = useState<number | null>(null);
   const quizContainerRef = useRef<HTMLDivElement>(null);
+
 
   const finishQuiz = useCallback((wasAutoSubmitted = false) => {
     if (!lesson) return;
