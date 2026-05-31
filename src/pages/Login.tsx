@@ -10,7 +10,14 @@ const PUBLISHED_APP_URL = "https://quest-sparkle-point.lovable.app";
 
 function getAuthRedirectUrl() {
   const origin = window.location.origin;
-  return origin.includes("id-preview--") ? PUBLISHED_APP_URL : origin;
+  const host = window.location.hostname;
+  const publishedHost = new URL(PUBLISHED_APP_URL).hostname;
+
+  if (host === publishedHost || host === "localhost" || host === "127.0.0.1") {
+    return origin;
+  }
+
+  return host.endsWith("lovableproject.com") || host.includes("id-preview--") ? PUBLISHED_APP_URL : origin;
 }
 
 export default function Login() {
