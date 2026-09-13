@@ -13,7 +13,7 @@ const navItems = [
   { to: "/lessons", icon: BookOpen, label: "Lessons" },
   { to: "/leaderboard", icon: Users, label: "Ranks" },
   { to: "/progress", icon: BarChart3, label: "Progress" },
-  { to: "/rewards", icon: Gift, label: "Rewards" },
+  // { to: "/rewards", icon: Gift, label: "Rewards" }, // hidden — work in progress
 ];
 
 export default function AppNavbar({ knowledgePoints, redeemablePoints, showHotspots }: AppNavbarProps) {
