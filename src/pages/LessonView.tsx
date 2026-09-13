@@ -286,6 +286,7 @@ export default function LessonView() {
               <li>• <strong>Switching tabs</strong>, leaving the window, or exiting fullscreen counts as a warning</li>
               <li>• <strong>Copy, paste, and right-click</strong> are disabled</li>
               <li>• You get <strong>{MAX_WARNINGS} warnings</strong> — after that, the quiz auto-submits</li>
+              <li>• You need a <strong>perfect score (100%)</strong> to pass — otherwise you can retake it</li>
             </ul>
             <Button onClick={startQuiz} className="w-full hotspot">
               <Maximize className="mr-2 h-4 w-4" /> Start Secure Quiz
