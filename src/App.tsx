@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
-import { useProgress } from "@/hooks/useProgress";
+import { ProgressProvider, useProgress } from "@/hooks/useProgress";
 import AppNavbar from "@/components/AppNavbar";
 import Index from "./pages/Index";
 import Lessons from "./pages/Lessons";
@@ -16,6 +16,12 @@ import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Remount LessonView whenever the lesson id changes so no state leaks between lessons
+function LessonViewRoute() {
+  const { id } = useParams();
+  return <LessonView key={id} />;
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { loading, user, profile } = useAuth();
@@ -38,7 +44,7 @@ function AppContent() {
         <Route path="/onboarding" element={!user ? <Navigate to="/login" replace /> : profile?.onboarded ? <Navigate to="/" replace /> : <Onboarding />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/lessons" element={<ProtectedRoute><Lessons /></ProtectedRoute>} />
-        <Route path="/lessons/:id" element={<ProtectedRoute><LessonView /></ProtectedRoute>} />
+        <Route path="/lessons/:id" element={<ProtectedRoute><LessonViewRoute /></ProtectedRoute>} />
         <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
         <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
@@ -54,7 +60,9 @@ const App = () => (
       <Toaster />
       <BrowserRouter>
         <AuthProvider>
-          <AppContent />
+          <ProgressProvider>
+            <AppContent />
+          </ProgressProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
