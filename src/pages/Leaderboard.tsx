@@ -6,7 +6,6 @@ import { useAuth } from "@/hooks/useAuth";
 interface Row {
   user_id: string;
   display_name: string | null;
-  email: string;
   kp: number;
   lessons: number;
 }
@@ -23,7 +22,7 @@ function nameOf(r: Row) {
     const parts = r.display_name.trim().split(/\s+/);
     return parts.length > 1 ? `${parts[0]} ${parts[1][0]}.` : parts[0];
   }
-  return r.email.split("@")[0];
+  return "Student";
 }
 
 export default function Leaderboard() {
@@ -35,33 +34,15 @@ export default function Leaderboard() {
     let active = true;
     (async () => {
       if (!school) return;
-      // Fetch progress + profiles + completion counts for this school
-      const [{ data: progs }, { data: profiles }, { data: comps }] = await Promise.all([
-        supabase
-          .from("student_progress")
-          .select("user_id,knowledge_points")
-          .eq("school_id", school.id),
-        supabase.from("profiles").select("id,display_name,email").eq("school_id", school.id),
-        supabase.from("lesson_completions").select("user_id").eq("school_id", school.id),
-      ]);
+      // Fetch school-scoped leaderboard via secure function (names + points only)
+      const { data } = await (supabase.rpc as any)("get_school_leaderboard");
       if (!active) return;
-      const lessonCounts: Record<string, number> = {};
-      (comps ?? []).forEach((c) => {
-        lessonCounts[c.user_id] = (lessonCounts[c.user_id] ?? 0) + 1;
-      });
-      const profMap = new Map((profiles ?? []).map((p) => [p.id, p]));
-      const merged: Row[] = (progs ?? [])
-        .map((p) => {
-          const prof = profMap.get(p.user_id);
-          return {
-            user_id: p.user_id,
-            display_name: prof?.display_name ?? null,
-            email: prof?.email ?? "",
-            kp: p.knowledge_points,
-            lessons: lessonCounts[p.user_id] ?? 0,
-          };
-        })
-        .sort((a, b) => b.kp - a.kp || b.lessons - a.lessons);
+      const merged: Row[] = (data ?? []).map((r: any) => ({
+        user_id: r.user_id,
+        display_name: r.display_name ?? null,
+        kp: r.knowledge_points,
+        lessons: Number(r.lessons_completed ?? 0),
+      }));
       setRows(merged);
       setLoading(false);
     })();
