@@ -35,7 +35,7 @@ export default function Leaderboard() {
     (async () => {
       if (!school) return;
       // Fetch school-scoped leaderboard via secure function (names + points only)
-      const { data } = await supabase.rpc("get_school_leaderboard");
+      const { data } = await (supabase.rpc as any)("get_school_leaderboard");
       if (!active) return;
       const merged: Row[] = (data ?? []).map((r: any) => ({
         user_id: r.user_id,
