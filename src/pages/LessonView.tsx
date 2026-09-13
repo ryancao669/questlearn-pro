@@ -81,6 +81,21 @@ export default function LessonView() {
     };
   }, [phase, quizStarted, triggerWarning]);
 
+  // Reset everything when navigating to a different lesson
+  useEffect(() => {
+    setStepIndex(0);
+    setPhase("lesson");
+    setQuizAnswers([]);
+    setCurrentQuizQ(0);
+    setExerciseAnswer(null);
+    setExerciseSubmitted(false);
+    setQuizStarted(false);
+    setWarnings(0);
+    setAutoSubmitted(false);
+    setScenarioIndex(0);
+    setScenarioChoice(null);
+  }, [id]);
+
   if (!lesson) return <div className="container py-8"><p>Lesson not found.</p><Link to="/lessons" className="text-primary underline">Back to lessons</Link></div>;
   if (!isLessonUnlocked(lesson.id)) return <div className="container py-8"><p>This lesson is locked. Complete the previous lesson first.</p><Link to="/lessons" className="text-primary underline">Back to lessons</Link></div>;
   if (isLessonCompleted(lesson.id) && phase === "lesson") {
