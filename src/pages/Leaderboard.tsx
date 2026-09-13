@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Trophy, Medal, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { lessons } from "@/data/lessons";
 
 interface Row {
   user_id: string;
@@ -51,7 +52,7 @@ export default function Leaderboard() {
     };
   }, [school]);
 
-  const totalLessons = 8; // matches lessons count
+  const totalLessons = lessons.length;
   const myRank = rows.findIndex((r) => r.user_id === user?.id) + 1;
   const podium = [rows[1], rows[0], rows[2]].filter(Boolean);
 
