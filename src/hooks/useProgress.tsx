@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -22,7 +22,7 @@ const DEFAULT_PROGRESS: UserProgress = {
   lastCompletedDate: null,
 };
 
-export function useProgress() {
+function useProgressState() {
   const { user, profile, isCreator, studentView } = useAuth();
   const creatorBypass = isCreator && !studentView;
   const [progress, setProgress] = useState<UserProgress>(DEFAULT_PROGRESS);
@@ -102,8 +102,9 @@ export function useProgress() {
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);
+      await reload();
     },
-    [user, profile, progress]
+    [user, profile, progress, reload]
   );
 
   const redeemReward = useCallback(
@@ -128,8 +129,9 @@ export function useProgress() {
         .from("student_progress")
         .update({ redeemable_points: newRP, updated_at: new Date().toISOString() })
         .eq("user_id", user.id);
+      await reload();
     },
-    [user, profile, progress]
+    [user, profile, progress, reload]
   );
 
   const isLessonUnlocked = useCallback(
@@ -147,5 +149,20 @@ export function useProgress() {
     await reload();
   }, [reload]);
 
-  return { progress, loaded, completeLesson, redeemReward, isLessonUnlocked, isLessonCompleted, resetProgress };
+  return { progress, loaded, completeLesson, redeemReward, isLessonUnlocked, isLessonCompleted, resetProgress, reload };
+}
+
+type ProgressContextValue = ReturnType<typeof useProgressState>;
+
+const ProgressContext = createContext<ProgressContextValue | null>(null);
+
+export function ProgressProvider({ children }: { children: ReactNode }) {
+  const value = useProgressState();
+  return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
+}
+
+export function useProgress() {
+  const ctx = useContext(ProgressContext);
+  if (!ctx) throw new Error("useProgress must be used within a ProgressProvider");
+  return ctx;
 }
