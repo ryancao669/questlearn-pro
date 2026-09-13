@@ -340,7 +340,7 @@ export const lessons: Lesson[] = [
   },
 
   {
-    id: 6,
+    id: 5,
     title: "Investing & Building Wealth",
     description: "Emergency funds, compound interest, stocks, and retirement accounts.",
     category: "Investing",
@@ -400,7 +400,7 @@ export const lessons: Lesson[] = [
     ]
   },
   {
-    id: 7,
+    id: 6,
     title: "Consumer Protection",
     description: "Identifying scams, protecting your identity, and knowing your rights.",
     category: "Protection",
@@ -472,7 +472,7 @@ export const lessons: Lesson[] = [
   },
 
   {
-    id: 8,
+    id: 7,
     title: "Financing Your Education",
     description: "Scholarships, merit aid, FAFSA, student loans, and minimizing college costs.",
     category: "Education",
