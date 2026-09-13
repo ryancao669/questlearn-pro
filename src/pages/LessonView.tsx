@@ -32,7 +32,9 @@ export default function LessonView() {
     if (!lesson) return;
     const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
     const score = Math.round((correct / lesson.quiz.length) * 100);
-    completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
+    if (score === 100) {
+      completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
+    }
     if (wasAutoSubmitted) setAutoSubmitted(true);
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     setPhase("results");
