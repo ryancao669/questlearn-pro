@@ -32,7 +32,9 @@ export default function LessonView() {
     if (!lesson) return;
     const correct = lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0);
     const score = Math.round((correct / lesson.quiz.length) * 100);
-    completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
+    if (score === 100) {
+      completeLesson(lesson.id, lesson.knowledgePoints, lesson.redeemablePoints, score);
+    }
     if (wasAutoSubmitted) setAutoSubmitted(true);
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     setPhase("results");
@@ -142,14 +144,48 @@ export default function LessonView() {
 
   const quizScore = phase === "results" ? lesson.quiz.reduce((acc, q, i) => acc + (quizAnswers[i] === q.correctIndex ? 1 : 0), 0) : 0;
 
+  const retakeQuiz = () => {
+    setQuizAnswers(new Array(lesson.quiz.length).fill(null));
+    setCurrentQuizQ(0);
+    setWarnings(0);
+    setAutoSubmitted(false);
+    setQuizStarted(false);
+    setPhase("quiz");
+  };
+
   if (phase === "results") {
+    const passed = quizScore === lesson.quiz.length;
     const nextLesson = lessons.find(l => l.id === lesson.id + 1);
+    if (!passed) {
+      return (
+        <div className="container py-8 animate-slide-up">
+          <div className="max-w-lg mx-auto rounded-xl border bg-card p-8 text-center">
+            <div className="text-5xl mb-4">📚</div>
+            <h2 className="font-heading text-2xl font-bold mb-2">Almost There!</h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              You need a perfect score to pass. You got {quizScore}/{lesson.quiz.length} — review the lesson and try again.
+            </p>
+            {autoSubmitted && <p className="text-sm text-destructive mb-2">The quiz was auto-submitted due to anti-cheat violations.</p>}
+            <div className="rounded-lg bg-muted p-3 mb-6">
+              <p className="text-2xl font-bold text-primary">{quizScore}/{lesson.quiz.length}</p>
+              <p className="text-xs text-muted-foreground">Quiz Score (need {lesson.quiz.length}/{lesson.quiz.length} to pass)</p>
+            </div>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Button onClick={retakeQuiz} className="hotspot">Retake Quiz</Button>
+              <Button variant="outline" onClick={() => { setPhase("lesson"); setStepIndex(0); setQuizStarted(false); setWarnings(0); setAutoSubmitted(false); setQuizAnswers([]); setCurrentQuizQ(0); }}>
+                <BookOpen className="mr-2 h-4 w-4" /> Review Lesson
+              </Button>
+              <Link to="/lessons"><Button variant="outline">All Lessons</Button></Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="container py-8 animate-slide-up">
         <div className="max-w-lg mx-auto rounded-xl border bg-card p-8 text-center">
-          <div className="text-5xl mb-4">{autoSubmitted ? "⚠️" : "🎉"}</div>
-          <h2 className="font-heading text-2xl font-bold mb-2">{autoSubmitted ? "Quiz Auto-Submitted" : "Lesson Complete!"}</h2>
-          {autoSubmitted && <p className="text-sm text-destructive mb-2">Too many anti-cheat violations during the quiz.</p>}
+          <div className="text-5xl mb-4">🎉</div>
+          <h2 className="font-heading text-2xl font-bold mb-2">Lesson Complete!</h2>
           <p className="text-muted-foreground mb-4">{lesson.icon} {lesson.title}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="rounded-lg bg-muted p-3">
@@ -250,6 +286,7 @@ export default function LessonView() {
               <li>• <strong>Switching tabs</strong>, leaving the window, or exiting fullscreen counts as a warning</li>
               <li>• <strong>Copy, paste, and right-click</strong> are disabled</li>
               <li>• You get <strong>{MAX_WARNINGS} warnings</strong> — after that, the quiz auto-submits</li>
+              <li>• You need a <strong>perfect score (100%)</strong> to pass — otherwise you can retake it</li>
             </ul>
             <Button onClick={startQuiz} className="w-full hotspot">
               <Maximize className="mr-2 h-4 w-4" /> Start Secure Quiz
