@@ -231,9 +231,6 @@ export default function Login() {
           </div>
         )}
 
-        <p className="text-xs text-muted-foreground text-center mt-4">
-          Built by Ryan Cao • Original CashQuest creator
-        </p>
       </div>
     </div>
   );

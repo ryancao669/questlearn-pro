@@ -43,7 +43,7 @@ export default function Index() {
         <p className="text-primary-foreground/80 mb-1 max-w-lg">
           Learn financial literacy through quick lessons, earn points, and redeem real rewards.
         </p>
-        <p className="text-primary-foreground/60 text-sm mb-6">Built by an MHS student</p>
+        
         <div className="flex flex-wrap gap-4">
           <Link to="/lessons">
             <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold hotspot">
